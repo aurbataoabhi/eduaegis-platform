@@ -15,6 +15,9 @@ import { BusinessGrowthEngine } from './business/growth-engine';
 import { AuthController } from './auth/auth-controller';
 import { PaymentGatewayService } from './payments/payment-service';
 import { NotificationService } from './notifications/notification-service';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 const app = express();
 const server = http.createServer(app);
@@ -237,6 +240,81 @@ app.post('/api/v1/notifications/send-reminder', async (req, res) => {
     ]
   });
   res.json(result);
+});
+
+// 15. Real Database Endpoints (Prisma + SQLite/Postgres)
+app.get('/api/v1/db/courses', async (req, res) => {
+  try {
+    const courses = await prisma.course.findMany({
+      include: {
+        teacher: { select: { fullName: true, email: true } },
+        modules: {
+          include: { lectures: true }
+        },
+        enrollments: true
+      }
+    });
+    res.json({ success: true, count: courses.length, courses });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/v1/db/users', async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        role: true,
+        studentRollNo: true,
+        createdAt: true
+      }
+    });
+    res.json({ success: true, count: users.length, users });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/v1/db/enroll-student', async (req, res) => {
+  try {
+    const { email, courseId } = req.body;
+    let user = await prisma.user.findUnique({ where: { email: email || 'alex@student.edu' } });
+    if (!user) {
+      user = await prisma.user.findFirst();
+    }
+    const course = courseId ? await prisma.course.findUnique({ where: { id: courseId } }) : await prisma.course.findFirst();
+
+    if (!user || !course) {
+      return res.status(404).json({ success: false, message: 'User or course not found in database.' });
+    }
+
+    const enrollment = await prisma.enrollment.upsert({
+      where: {
+        userId_courseId: {
+          userId: user.id,
+          courseId: course.id
+        }
+      },
+      update: {},
+      create: {
+        userId: user.id,
+        courseId: course.id
+      }
+    });
+
+    res.json({
+      success: true,
+      message: 'Student permanently enrolled into database!',
+      enrollment,
+      user: { name: user.fullName, email: user.email },
+      course: { title: course.title, price: course.price }
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 const PORT = process.env.PORT || 4200;

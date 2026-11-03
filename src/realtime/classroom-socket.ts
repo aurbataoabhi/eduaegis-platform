@@ -306,6 +306,56 @@ export class ClassroomRealtimeManager {
           whiteboardDataUrl: state.whiteboardDataUrl
         });
       });
+
+      // 7. WebRTC Live Camera & Screen Share Signaling Mesh
+      socket.on('WEBRTC_SIGNAL', (data: {
+        sessionId: string;
+        targetSocketId?: string;
+        signal: any;
+        senderRole: 'TEACHER' | 'STUDENT';
+      }) => {
+        if (data.targetSocketId) {
+          // Send direct point-to-point signal to specific peer
+          this.io.to(data.targetSocketId).emit('WEBRTC_SIGNAL', {
+            senderSocketId: socket.id,
+            signal: data.signal,
+            senderRole: data.senderRole
+          });
+        } else {
+          // Broadcast to everyone else in room
+          socket.to(data.sessionId).emit('WEBRTC_SIGNAL', {
+            senderSocketId: socket.id,
+            signal: data.signal,
+            senderRole: data.senderRole
+          });
+        }
+      });
+
+      // 8. Real-time Multi-Device Whiteboard Sync
+      socket.on('WHITEBOARD_DRAW_EVENT', (data: {
+        sessionId: string;
+        drawType: 'LINE' | 'RECT' | 'CLEAR';
+        payload: any;
+      }) => {
+        socket.to(data.sessionId).emit('WHITEBOARD_DRAW_EVENT', data);
+      });
+
+      // 9. Real-time Classroom Chat
+      socket.on('SEND_CHAT_MESSAGE', (data: {
+        sessionId: string;
+        senderName: string;
+        senderRole: string;
+        text: string;
+      }) => {
+        const messagePayload = {
+          id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+          senderName: data.senderName,
+          senderRole: data.senderRole,
+          text: data.text,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        this.io.to(data.sessionId).emit('NEW_CHAT_MESSAGE', messagePayload);
+      });
     });
   }
 }
