@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # EduAegis Core App (API, Socket.io, DRM & Web Front)
+  eduaegis-app:
+    build: .
+    container_name: eduaegis-core
+    restart: always
+    ports:
+      - "4200:4200"
+    environment:
+      - PORT=4200
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://eduaegis_user:securepassword2026@postgres:5432/eduaegis_db?schema=public
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=eduaegis_prod_jwt_supersecret_key_2026
+      - WATERMARK_SECRET=eduaegis_tamperproof_watermark_salt
+    depends_on:
+      - postgres
+      - redis
+
+  # Production Relational Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: eduaegis-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: eduaegis_user
+      POSTGRES_PASSWORD: securepassword2026
+      POSTGRES_DB: eduaegis_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # High-Speed Redis for Realtime Quizzes & Session State Checkpoints
+  redis:
+    image: redis:7-alpine
+    container_name: eduaegis-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+
+volumes:
+  pgdata:
+  redisdata:

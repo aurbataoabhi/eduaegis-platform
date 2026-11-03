@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduAegis — Resilient, Anti-Piracy Live Teaching & LMS Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @keyframes floatWatermark {
+      0% { transform: translate(50px, 40px); }
+      25% { transform: translate(calc(100% - 350px), 120px); }
+      50% { transform: translate(calc(100% - 400px), calc(100% - 100px)); }
+      75% { transform: translate(80px, calc(100% - 80px)); }
+      100% { transform: translate(50px, 40px); }
+    }
+    .watermark-anim {
+      animation: floatWatermark 24s ease-in-out infinite alternate;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Navigation Bar -->
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+        <i class="fa-solid fa-shield-halved text-white text-lg"></i>
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">EduAegis</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">PATENTED SHIELD</span>
+        </div>
+        <p class="text-xs text-slate-400">Resilient Anti-Piracy Live Teaching Infrastructure</p>
+      </div>
+    </div>
+
+    <!-- Persistent Session & Device Status Indicator -->
+    <div class="hidden md:flex items-center space-x-6 text-xs text-slate-300">
+      <div class="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Session: <strong class="text-white">Persistent (Zero-Zoom Links)</strong></span>
+      </div>
+      <div class="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
+        <i class="fa-solid fa-lock text-indigo-400"></i>
+        <span>DRM: <strong class="text-indigo-300">AES-128 & Hardware Guard</strong></span>
+      </div>
+      <div class="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
+        <i class="fa-solid fa-wifi text-emerald-400"></i>
+        <span>Mesh: <strong class="text-emerald-300">Power-Cut Checkpoint Ready</strong></span>
+      </div>
+    </div>
+
+    <!-- User Profile Badge & Quick Role Switcher -->
+    <div class="flex items-center space-x-4">
+      <div class="bg-slate-800/90 border border-slate-700 rounded-xl px-3 py-1 flex items-center space-x-2">
+        <span class="text-[11px] font-semibold text-slate-400">Current Role:</span>
+        <select id="role-selector" onchange="switchRole(this.value)" class="bg-slate-900 border border-slate-700 text-xs font-bold text-emerald-400 rounded-lg px-2 py-1 focus:outline-none cursor-pointer">
+          <option value="STUDENT">👨‍🎓 Student (Alex Chen)</option>
+          <option value="TEACHER">👨‍🏫 Teacher (Dr. Vance)</option>
+          <option value="FOUNDER">👑 Founder (Abhishek)</option>
+        </select>
+      </div>
+
+      <div class="hidden sm:flex items-center space-x-3">
+        <div class="text-right">
+          <div id="profile-name" class="text-xs font-semibold text-white">Alex Chen</div>
+          <div id="profile-sub" class="text-[11px] text-slate-400">Apex Tech Academy • CS-2026-042</div>
+        </div>
+        <div id="profile-avatar" class="w-9 h-9 rounded-full bg-indigo-600/40 border border-indigo-400 flex items-center justify-center text-sm font-bold text-indigo-200">
+          AC
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="bg-slate-900 border-b border-slate-800 px-6 flex space-x-2 overflow-x-auto text-sm">
+    <button onclick="switchTab('founder')" id="tab-btn-founder" class="tab-btn px-4 py-3 font-semibold border-b-2 border-emerald-500 text-emerald-400 flex items-center space-x-2 bg-emerald-500/10 rounded-t-lg">
+      <i class="fa-solid fa-crown text-amber-400"></i>
+      <span>Founder Business Command Center</span>
+    </button>
+    <button onclick="switchTab('landing')" id="tab-btn-landing" class="tab-btn px-4 py-3 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2">
+      <i class="fa-solid fa-bullhorn text-cyan-400"></i>
+      <span>Public Sales Page (Visitor View)</span>
+    </button>
+    <button onclick="switchTab('teacher')" id="tab-btn-teacher" class="tab-btn px-4 py-3 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2">
+      <i class="fa-solid fa-chalkboard-user text-rose-400"></i>
+      <span>Teacher Studio & Controls</span>
+    </button>
+    <button onclick="switchTab('live')" id="tab-btn-live" class="tab-btn px-4 py-3 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2">
+      <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+      <i class="fa-solid fa-video"></i>
+      <span>Live Classroom Studio</span>
+    </button>
+    <button onclick="switchTab('curriculum')" id="tab-btn-curriculum" class="tab-btn px-4 py-3 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2">
+      <i class="fa-solid fa-book-bookmark"></i>
+      <span>Curriculum & Archive</span>
+    </button>
+    <button onclick="switchTab('quiz')" id="tab-btn-quiz" class="tab-btn px-4 py-3 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2">
+      <i class="fa-solid fa-bolt-lightning text-amber-400"></i>
+      <span>Fastest-Finger Quiz</span>
+    </button>
+    <button onclick="switchTab('coding')" id="tab-btn-coding" class="tab-btn px-4 py-3 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2">
+      <i class="fa-solid fa-code text-cyan-400"></i>
+      <span>Hackathon & Coding Arena</span>
+    </button>
+    <button onclick="switchTab('ai')" id="tab-btn-ai" class="tab-btn px-4 py-3 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2">
+      <i class="fa-solid fa-brain text-purple-400"></i>
+      <span>AI Doubt Solver (Anti-Cheat)</span>
+    </button>
+    <button onclick="switchTab('saas')" id="tab-btn-saas" class="tab-btn px-4 py-3 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2">
+      <i class="fa-solid fa-chart-line text-emerald-400"></i>
+      <span>SaaS Tiers & Monetization</span>
+    </button>
+  </nav>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 p-6 max-w-7xl w-full mx-auto">
+
+    <!-- 0. FOUNDER BUSINESS COMMAND CENTER -->
+    <div id="view-founder" class="space-y-6">
+      <!-- Founder Header Banner -->
+      <div class="bg-gradient-to-r from-emerald-950/80 via-slate-900 to-indigo-950/80 border border-emerald-500/40 p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xl">
+        <div class="flex items-center space-x-4">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-indigo-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-emerald-500/20">
+            <i class="fa-solid fa-chart-pie"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-xl font-bold text-white tracking-tight">Founder Executive Command Hub</h2>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-slate-950 uppercase">LIVE REVENUE ENGINE</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Real-time SaaS recurring revenue, student volume, and anti-piracy deterrence telemetry.</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button onclick="switchTab('landing')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center space-x-2">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <span>Preview Public Sales Page</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Core Financial KPIs Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Monthly Recurring Revenue (MRR) -->
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden group hover:border-emerald-500/50 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Monthly SaaS (MRR)</span>
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-wallet"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-black text-white mt-2">$14,850</div>
+          <div class="text-[11px] text-emerald-400 font-semibold mt-1 flex items-center space-x-1">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+            <span>+28% from last month ($178.2K ARR)</span>
+          </div>
+        </div>
+
+        <!-- Platform Tuition Volume (GMV) -->
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden group hover:border-indigo-500/50 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tuition Volume (GMV)</span>
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-black text-white mt-2">$486,000</div>
+          <div class="text-[11px] text-indigo-300 font-semibold mt-1">
+            Your 5% Platform Cut: <strong class="text-white">$24,300</strong>
+          </div>
+        </div>
+
+        <!-- Active Paying Academies -->
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden group hover:border-amber-500/50 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Paying Academies</span>
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-school"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-black text-white mt-2">188</div>
+          <div class="text-[11px] text-slate-400 mt-1">14,250 Active Students Enrolled</div>
+        </div>
+
+        <!-- Piracy Screen-Grabs Blocked -->
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden group hover:border-rose-500/50 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Piracy Blocked</span>
+            <div class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-shield-virus"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-black text-rose-400 mt-2">3,840</div>
+          <div class="text-[11px] text-slate-400 mt-1">~$192K Protected Institute Revenue</div>
+        </div>
+      </div>
+
+      <!-- Two Core Business Growth Tools -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 1-Click Zoom Migration Engine -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center space-x-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-file-import"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-base">1-Click "Zoom to EduAegis" Migrator</h3>
+                <p class="text-xs text-slate-400">Onboard a coaching center's entire student body in under 60 seconds.</p>
+              </div>
+            </div>
+
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Paste Student Roster (Name, Email, Mobile, Batch):</label>
+            <textarea id="migration-csv" rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-500 resize-none">Rahul Sharma, rahul@testprep.com, +91-9876543210, IIT-JEE Batch A
+Sneha Patel, sneha@testprep.com, +91-9876543211, IIT-JEE Batch A
+Arjun Rao, arjun@testprep.com, +91-9876543212, NEET Medical 2026
+Ananya Gupta, ananya@testprep.com, +91-9876543213, NEET Medical 2026</textarea>
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between">
+            <span class="text-xs text-slate-400">Generates instant magic login access keys</span>
+            <button onclick="runInstituteMigration()" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center space-x-2 shadow-lg shadow-cyan-600/20">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>Import & Send Magic Links</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 20% Viral Tutor Referral Affiliate Link Generator -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center space-x-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-users-rays"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-base">Viral 20% Lifetime Affiliate Partner Program</h3>
+                <p class="text-xs text-slate-400">Turn every teacher into your salesperson by giving them 20% recurring monthly commissions.</p>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Teacher / Partner Name:</label>
+                <input type="text" id="affiliate-name" value="Prof. R.K. Verma (Physics Lead)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Generated Tracking Invite Link:</label>
+                <div class="flex items-center space-x-2">
+                  <input type="text" readonly id="affiliate-link" value="https://eduaegis.com/join?ref=REF-VERMAPHYSICS-20" class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-amber-400 font-mono">
+                  <button onclick="copyAffiliateLink()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-2 rounded-lg border border-slate-700">
+                    <i class="fa-solid fa-copy"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <span>Commission: <strong class="text-emerald-400">20% Monthly Recurring</strong></span>
+            <span class="text-slate-300">Pauyouts automated via Stripe / Razorpay</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 0.1 PUBLIC SALES LANDING PAGE (VISITOR VIEW) -->
+    <div id="view-landing" class="hidden space-y-12 py-4">
+      <!-- Hero Section -->
+      <div class="text-center space-y-4 max-w-3xl mx-auto">
+        <span class="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30">
+          <i class="fa-solid fa-shield-virus mr-2"></i> STOP LOSING 30% OF TUITION TO TELEGRAM PIRACY
+        </span>
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+          The Only Live Teaching Platform with <span class="bg-gradient-to-r from-emerald-400 to-indigo-400 bg-clip-text text-transparent">0% Piracy</span> That Survives Power Cuts.
+        </h1>
+        <p class="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto">
+          Built specifically for coaching institutes, tuition companies, and high-stakes educators who are tired of leaked lecture videos and Zoom disconnections.
+        </p>
+        <div class="flex items-center justify-center space-x-4 pt-2">
+          <button onclick="switchTab('live')" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm px-6 py-3 rounded-xl shadow-xl shadow-emerald-500/20 flex items-center space-x-2">
+            <span>Launch Live Interactive Demo</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+          <button onclick="alert('14-Day Free Pilot: Start your zero-risk pilot today with up to 500 students.')" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm px-6 py-3 rounded-xl border border-slate-700">
+            Start 14-Day Free Pilot
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Piracy Loss & Recovery Calculator -->
+      <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-8 max-w-4xl mx-auto shadow-2xl">
+        <div class="text-center mb-8">
+          <h3 class="text-xl font-bold text-white">Interactive Piracy Loss & Profit Recovery Calculator</h3>
+          <p class="text-xs text-slate-400 mt-1">See how much revenue your coaching center is currently losing to unauthorized video screen-grabbers:</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div class="space-y-6">
+            <div>
+              <div class="flex justify-between text-xs font-semibold text-slate-300 mb-2">
+                <span>Total Active Students in Your Academy:</span>
+                <span id="slider-students-val" class="text-emerald-400 font-bold text-sm">250 Students</span>
+              </div>
+              <input type="range" id="slider-students" min="50" max="1500" step="25" value="250" oninput="calculateLandingRoi()" class="w-full accent-emerald-500 cursor-pointer">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-semibold text-slate-300 mb-2">
+                <span>Average Course / Batch Fee:</span>
+                <span id="slider-fee-val" class="text-emerald-400 font-bold text-sm">$350 / student</span>
+              </div>
+              <input type="range" id="slider-fee" min="50" max="1500" step="50" value="350" oninput="calculateLandingRoi()" class="w-full accent-emerald-500 cursor-pointer">
+            </div>
+
+            <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1">
+              <div>• Total Annual Tuition Base: <strong id="calc-base-tuition" class="text-white">$87,500</strong></div>
+              <div>• Typical Unprotected Telegram Leak Rate: <strong class="text-rose-400">25% of potential enrollments</strong></div>
+            </div>
+          </div>
+
+          <!-- Recovery Result Card -->
+          <div class="bg-emerald-950/30 border-2 border-emerald-500/50 rounded-2xl p-6 text-center space-y-4 shadow-xl shadow-emerald-500/10">
+            <span class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/30">
+              Recoverable Lost Profit
+            </span>
+            <div id="calc-recovered-val" class="text-4xl font-black text-emerald-400">+$15,312</div>
+            <p class="text-xs text-slate-300">
+              By blocking screen recording and stamping student IDs dynamically, EduAegis pays for its own subscription <strong id="calc-roi-multiplier" class="text-white">16.2x over</strong> in recovered tuition fees!
+            </p>
+            <button onclick="alert('Request sent! An EduAegis enterprise specialist will contact your academy within 2 hours.')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs py-3 rounded-xl shadow-lg shadow-emerald-500/20">
+              Claim Your Free 14-Day Anti-Piracy Pilot
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 0.2 TEACHER STUDIO & CONTROL DECK -->
+    <div id="view-teacher" class="hidden space-y-6">
+      <div class="bg-gradient-to-r from-rose-950/60 via-slate-900 to-indigo-950/60 border border-rose-500/40 p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xl">
+        <div class="flex items-center space-x-4">
+          <div class="w-14 h-14 rounded-2xl bg-rose-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-rose-600/30">
+            <i class="fa-solid fa-tower-broadcast"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-xl font-bold text-white tracking-tight">Instructor Live Studio & Moderation Console</h2>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500 text-white uppercase animate-pulse">LIVE BROADCASTING</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Host: Dr. Marcus Vance • RTMP & WebRTC Cloud Mixer Mesh Active</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button onclick="triggerTeacherMuteAll()" class="bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs font-semibold px-4 py-2.5 rounded-xl border border-rose-500/40 flex items-center space-x-2">
+            <i class="fa-solid fa-microphone-slash"></i>
+            <span>Mute All Students</span>
+          </button>
+          <button onclick="sendWhatsAppReminder()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 flex items-center space-x-2">
+            <i class="fa-brands fa-whatsapp text-sm"></i>
+            <span>Send 10m WhatsApp Class Alert</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Teacher Studio Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Live Pop Quiz Launcher Widget (Left 2 Cols) -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-base">
+                  <i class="fa-solid fa-bolt-lightning"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-white text-sm">Push Live Pop Quiz to Active Stream</h3>
+                  <p class="text-xs text-slate-400">Pushes instantly to all 482 students' viewports with millisecond winner tracking.</p>
+                </div>
+              </div>
+              <span class="text-xs bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded border border-amber-500/30 font-semibold">Fastest-Finger-First</span>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Quiz Question Text:</label>
+                <input type="text" id="teacher-quiz-q" value="What is the primary role of a heartbeat in the Raft consensus protocol?" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-amber-500">
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Option A (Wrong):</label>
+                  <input type="text" value="To measure client HTTP round-trip latency" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-300">
+                </div>
+                <div>
+                  <label class="block text-[11px] text-emerald-400 mb-1 font-semibold">Option B (Correct Answer):</label>
+                  <input type="text" value="To prevent followers from triggering unnecessary elections" class="w-full bg-slate-950 border border-emerald-500/50 rounded-lg p-2.5 text-xs text-white">
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between pt-2">
+                <div class="flex items-center space-x-2 text-xs text-slate-400">
+                  <i class="fa-regular fa-clock text-amber-400"></i>
+                  <span>Timer: <strong>30 seconds</strong></span>
+                </div>
+                <button onclick="launchTeacherQuiz()" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl flex items-center space-x-2 shadow-lg shadow-amber-600/30">
+                  <i class="fa-solid fa-paper-plane"></i>
+                  <span>Broadcast Quiz to 482 Students Now</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Teacher Course Payouts & Earnings Card -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <h3 class="font-bold text-white text-sm mb-1">Your Course Batch Earnings & Automatic Payouts</h3>
+            <p class="text-xs text-slate-400 mb-4">Direct deposit processed securely via integrated payment gateway.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                <div class="text-[11px] text-slate-400">Gross Student Enrollments:</div>
+                <div class="text-2xl font-black text-white mt-1">$14,950</div>
+                <div class="text-[10px] text-slate-400">50 Students @ $299</div>
+              </div>
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                <div class="text-[11px] text-slate-400">EduAegis 5% Platform Fee:</div>
+                <div class="text-2xl font-black text-indigo-400 mt-1">-$747.50</div>
+                <div class="text-[10px] text-slate-400">Platform Maintenance & DRM</div>
+              </div>
+              <div class="bg-slate-950 p-4 rounded-xl border border-emerald-500/40">
+                <div class="text-[11px] text-emerald-400 font-semibold">Your Net Bank Deposit (95%):</div>
+                <div class="text-2xl font-black text-emerald-400 mt-1">$14,202.50</div>
+                <div class="text-[10px] text-emerald-400 flex items-center space-x-1">
+                  <i class="fa-solid fa-circle-check"></i>
+                  <span>Direct Bank Payout Active</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side: Real-time Audio/Video Health & Hand-Raise Queue -->
+        <div class="space-y-6">
+          <!-- Panic Alert Health Gauge -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <h4 class="font-bold text-white text-xs uppercase tracking-wider mb-2 flex items-center space-x-2">
+              <i class="fa-solid fa-heart-pulse text-emerald-400"></i>
+              <span>Stream Health & Panic Ping Gauge</span>
+            </h4>
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center space-y-2">
+              <div class="text-3xl font-black text-emerald-400">99.8%</div>
+              <p class="text-xs text-slate-300">Zero audio/video drop complaints in last 15 minutes.</p>
+              <div class="text-[10px] text-slate-500">Auto-triggers HUD alert if &ge; 3 students hit panic button.</div>
+            </div>
+          </div>
+
+          <!-- Hand-Raise Moderation Desk -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-xs uppercase tracking-wider">Student Hand-Raise Queue (2)</h4>
+              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/30">Priority Sorted</span>
+            </div>
+
+            <div class="space-y-2 text-xs">
+              <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                <div>
+                  <div class="font-semibold text-white">1. Priya Sharma</div>
+                  <div class="text-[10px] text-slate-400">Raised 42s ago • Question on Log Replication</div>
+                </div>
+                <button onclick="alert('Priya unmuted! Her microphone is now live on stream.')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3 py-1.5 rounded-lg">Unmute</button>
+              </div>
+
+              <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                <div>
+                  <div class="font-semibold text-white">2. Alex Chen</div>
+                  <div class="text-[10px] text-slate-400">Raised 18s ago • Question on Split-Brain</div>
+                </div>
+                <button onclick="alert('Alex unmuted! His microphone is now live on stream.')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3 py-1.5 rounded-lg">Unmute</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. LIVE CLASSROOM STUDIO VIEW -->
+    <div id="view-live" class="hidden space-y-6">
+      <!-- Teacher HUD Emergency Alert Banner (Triggered by panic button) -->
+      <div id="teacher-hud-banner" class="hidden bg-rose-500/20 border-2 border-rose-500 text-rose-200 p-4 rounded-xl flex items-center justify-between shadow-2xl animate-pulse">
+        <div class="flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-lg bg-rose-600 flex items-center justify-center text-white text-2xl">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-base text-white">TEACHER ALERT: 8 Students Report Inaudible Audio / Frozen Feed!</h4>
+            <p class="text-xs text-rose-300">Automatic diagnostic: Check your microphone input selector or toggle to low-bandwidth 24kbps Opus fallback.</p>
+          </div>
+        </div>
+        <button onclick="dismissTeacherAlert()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-4 py-2 rounded-lg">
+          Acknowledge & Adjust
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Secure Video Player Container (2 Columns) -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="relative bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl aspect-video flex flex-col items-center justify-center group select-none">
+            
+            <!-- Simulated Video Stage -->
+            <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex flex-col items-center justify-center p-8 text-center">
+              <div class="w-20 h-20 rounded-full bg-indigo-600/20 border border-indigo-500/50 flex items-center justify-center mb-4">
+                <i class="fa-solid fa-chalkboard-user text-3xl text-indigo-400"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-1">Live Lecture: Distributed System Resilience & Consensus Algorithms</h3>
+              <p class="text-sm text-slate-400 max-w-md">Instructor: Dr. Marcus Vance • Apex Academy • Cloud Egress Mixer Active</p>
+              
+              <div class="mt-6 flex items-center space-x-3">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-2 animate-ping"></span> LIVE (482 Students)
+                </span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                  <i class="fa-solid fa-shield-virus mr-1 text-emerald-400"></i> Anti-Screen Grab Active
+                </span>
+              </div>
+            </div>
+
+            <!-- Dynamic Forensic Watermark Layer (Canvas/CSS Overlay) -->
+            <div id="dynamic-watermark" class="watermark-anim absolute pointer-events-none select-none text-white/30 text-xs font-mono font-bold tracking-wider z-20 px-3 py-1 rounded bg-black/20 backdrop-blur-xs border border-white/10">
+              Alex Chen [CS-2026-042] • 192.168.1.104 • 2026-11-03 13:40 UTC • hmac:a8f9c01d
+            </div>
+
+            <!-- Anti-Screen Capture Blackout Shield (Visible when screenshot or blur triggered) -->
+            <div id="blackout-shield" class="hidden absolute inset-0 bg-black/95 z-40 flex flex-col items-center justify-center p-6 text-center">
+              <i class="fa-solid fa-eye-slash text-rose-500 text-4xl mb-3"></i>
+              <h3 class="text-lg font-bold text-white">Content Shield Engaged</h3>
+              <p class="text-xs text-slate-400 max-w-sm mt-1">Screen recording, screenshots, or background window mirroring are strictly prohibited to protect intellectual property.</p>
+              <button onclick="restoreShield()" class="mt-4 bg-slate-800 hover:bg-slate-700 text-white text-xs px-4 py-2 rounded-lg border border-slate-700">
+                Return to Viewport
+              </button>
+            </div>
+
+            <!-- Video Player Controls Bar -->
+            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 flex items-center justify-between z-30">
+              <div class="flex items-center space-x-3">
+                <button class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-xs">
+                  <i class="fa-solid fa-pause"></i>
+                </button>
+                <div class="text-xs text-slate-300">01:14:28 / 02:00:00</div>
+                <div class="h-4 w-px bg-white/20"></div>
+                <button class="text-slate-300 hover:text-white text-xs flex items-center space-x-1">
+                  <i class="fa-solid fa-gauge-high"></i> <span>1.0x</span>
+                </button>
+                <button class="text-slate-300 hover:text-white text-xs flex items-center space-x-1">
+                  <i class="fa-solid fa-closed-captioning"></i> <span>Auto CC</span>
+                </button>
+              </div>
+
+              <!-- Student Quick Actions & Panic Alert -->
+              <div class="flex items-center space-x-2">
+                <!-- TEACHER NOT AUDIBLE / VISIBLE PANIC BUTTON -->
+                <button onclick="triggerPanicAlert()" class="bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 shadow-lg shadow-rose-600/30 transition-transform active:scale-95">
+                  <i class="fa-solid fa-volume-xmark"></i>
+                  <span>Teacher Inaudible / Frozen</span>
+                </button>
+                
+                <button onclick="toggleHandRaise()" id="btn-hand-raise" class="bg-amber-600/80 hover:bg-amber-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5">
+                  <i class="fa-solid fa-hand"></i>
+                  <span>Raise Hand</span>
+                </button>
+
+                <button onclick="testBrowserDownloadBlock()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-2.5 py-1.5 rounded-lg border border-slate-700" title="Attempt Browser Download">
+                  <i class="fa-solid fa-download"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- In-Stream Materials & Real-time Live Resources Pushed by Teacher -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-sm font-semibold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-cloud-arrow-down text-indigo-400"></i>
+                <span>In-Lecture Pushed Resources</span>
+              </h4>
+              <span class="text-xs text-slate-400">Teacher pushed 2 minutes ago</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700/60 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <i class="fa-solid fa-file-pdf text-rose-400 text-xl"></i>
+                  <div>
+                    <div class="text-xs font-medium text-white">Consensus_Raft_Diagrams.pdf</div>
+                    <div class="text-[10px] text-slate-400">3.8 MB • Verified Document</div>
+                  </div>
+                </div>
+                <button class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded">Open</button>
+              </div>
+              <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700/60 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <i class="fa-solid fa-file-code text-cyan-400 text-xl"></i>
+                  <div>
+                    <div class="text-xs font-medium text-white">Live_Practice_Exercise_4.py</div>
+                    <div class="text-[10px] text-slate-400">12 KB • Live Lab Exercise</div>
+                  </div>
+                </div>
+                <button onclick="switchTab('coding')" class="text-xs bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1 rounded">Solve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side: Classroom Chat & Moderation Controls -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl flex flex-col h-[520px]">
+          <!-- Room Header -->
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-comments text-indigo-400"></i>
+              <span class="font-semibold text-sm text-white">Live Class Chat</span>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">Moderated</span>
+          </div>
+
+          <!-- Chat Messages Scroll Container -->
+          <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 custom-scrollbar text-xs">
+            <div class="bg-slate-800/50 p-2.5 rounded-lg border border-slate-700/50">
+              <div class="flex items-center justify-between text-slate-400 mb-1">
+                <span class="font-semibold text-indigo-300">Dr. Marcus Vance (Instructor)</span>
+                <span>13:38</span>
+              </div>
+              <p class="text-slate-200">Welcome everyone! In today's session, make sure to solve the live quiz at 13:45 to test your grasp on Raft leader election.</p>
+            </div>
+
+            <div class="bg-slate-800/30 p-2.5 rounded-lg border border-slate-700/30">
+              <div class="flex items-center justify-between text-slate-400 mb-1">
+                <span class="font-semibold text-slate-300">Priya Sharma</span>
+                <span>13:40</span>
+              </div>
+              <p class="text-slate-200">Sir, what happens if the leader loses heartbeat during log replication?</p>
+            </div>
+
+            <div id="hand-raise-alert-box" class="hidden bg-amber-500/10 border border-amber-500/30 text-amber-300 p-2 rounded-lg flex items-center space-x-2">
+              <i class="fa-solid fa-hand text-amber-400"></i>
+              <span>Your hand is raised (#2 in teacher's queue).</span>
+            </div>
+          </div>
+
+          <!-- Chat Input -->
+          <div class="p-3 border-t border-slate-800 flex items-center space-x-2">
+            <input type="text" placeholder="Ask a question in class..." class="flex-1 bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg text-xs font-semibold">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. CURRICULUM & ARCHIVE VIEW -->
+    <div id="view-curriculum" class="hidden space-y-6">
+      <!-- Course Purchase & Enrollment Banner -->
+      <div class="bg-gradient-to-r from-indigo-950/80 via-slate-900 to-emerald-950/80 border border-indigo-500/40 p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
+        <div>
+          <span class="text-[11px] font-bold text-indigo-400 uppercase tracking-wider bg-indigo-500/10 px-2.5 py-1 rounded border border-indigo-500/30">PREMIUM COURSE BATCH 2026</span>
+          <h2 class="text-xl font-bold text-white mt-2">Full-Stack Distributed Systems Engineering</h2>
+          <p class="text-xs text-slate-400 mt-1">Instructor: Dr. Marcus Vance • 18 Lectures • Lifetime DRM Access</p>
+        </div>
+        <div class="flex items-center space-x-3">
+          <div class="text-right">
+            <div class="text-xs text-slate-400">Batch Price:</div>
+            <div class="text-2xl font-black text-white">$299</div>
+          </div>
+          <button onclick="testCourseCheckout()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-5 py-3 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center space-x-2">
+            <i class="fa-solid fa-credit-card"></i>
+            <span>Enroll Now (Simulate Checkout)</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+        <div>
+          <h2 class="text-xl font-bold text-white">Full-Stack Distributed Systems Engineering</h2>
+          <p class="text-xs text-slate-400 mt-1">Hierarchical Syllabus • Playlists • Drag-and-drop Topic Organization • Encrypted Offline Caching</p>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center space-x-2">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Module / Lecture</span>
+          </button>
+          <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2 rounded-lg border border-slate-700 flex items-center space-x-2">
+            <i class="fa-solid fa-arrows-up-down"></i>
+            <span>Reorder Series</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modules Accordion -->
+      <div class="space-y-4">
+        <!-- Module 1 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+          <div class="bg-slate-850 p-4 flex items-center justify-between cursor-pointer border-b border-slate-800">
+            <div class="flex items-center space-x-3">
+              <i class="fa-solid fa-folder-open text-indigo-400 text-lg"></i>
+              <div>
+                <h4 class="text-sm font-bold text-white">Module 1: Foundations of Fault-Tolerant Architectures</h4>
+                <p class="text-xs text-slate-400">4 Lectures • 2 Quizzes • 1 Coding Contest</p>
+              </div>
+            </div>
+            <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">100% Completed</span>
+          </div>
+          <div class="divide-y divide-slate-800/60">
+            <div class="p-3.5 px-6 flex items-center justify-between hover:bg-slate-800/30">
+              <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                <div>
+                  <div class="text-xs font-semibold text-white">1.1 Introduction to Network Partitions and CAP Theorem</div>
+                  <div class="text-[11px] text-slate-400">54 mins • Recorded Oct 14 • AES-128 DRM Protected</div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded border border-slate-700">Watch Archive</button>
+              </div>
+            </div>
+            <div class="p-3.5 px-6 flex items-center justify-between hover:bg-slate-800/30">
+              <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                <div>
+                  <div class="text-xs font-semibold text-white">1.2 Vector Clocks & Lamport Timestamps</div>
+                  <div class="text-[11px] text-slate-400">1 hr 12 mins • Offline Cached in Desktop App</div>
+                </div>
+              </div>
+              <button class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded border border-slate-700">Watch Archive</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Module 2 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+          <div class="bg-slate-850 p-4 flex items-center justify-between cursor-pointer border-b border-slate-800">
+            <div class="flex items-center space-x-3">
+              <i class="fa-solid fa-folder-open text-indigo-400 text-lg"></i>
+              <div>
+                <h4 class="text-sm font-bold text-white">Module 2: Consensus Protocols (Paxos, Raft, Zab)</h4>
+                <p class="text-xs text-slate-400">5 Lectures • 1 Live Session in Progress</p>
+              </div>
+            </div>
+            <span class="text-xs text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-full border border-rose-500/20 flex items-center space-x-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
+              <span>Live Class In Session</span>
+            </span>
+          </div>
+          <div class="divide-y divide-slate-800/60">
+            <div class="p-3.5 px-6 flex items-center justify-between bg-indigo-950/20">
+              <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-tower-broadcast text-rose-500 animate-pulse"></i>
+                <div>
+                  <div class="text-xs font-semibold text-white">2.1 Live Class: Raft Leader Election & Resilient State Synchronization</div>
+                  <div class="text-[11px] text-slate-400">Started 13:30 • Single-Click Join • Zero Zoom IDs</div>
+                </div>
+              </div>
+              <button onclick="switchTab('live')" class="text-xs bg-rose-600 hover:bg-rose-500 text-white font-semibold px-4 py-1.5 rounded-lg shadow-lg shadow-rose-600/30">
+                Join Classroom
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. LIVE QUIZ (FASTEST-FINGER-FIRST) VIEW -->
+    <div id="view-quiz" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xl">
+              <i class="fa-solid fa-bolt-lightning"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-white text-base">Fastest-Finger-First (FFF) Live Quiz Arena</h3>
+              <p class="text-xs text-slate-400">Sub-millisecond server timestamping determines the earliest correct student winner in real time.</p>
+            </div>
+          </div>
+          <button onclick="simulateTeacherPushQuiz()" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center space-x-2">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Simulate Teacher Launching Quiz</span>
+          </button>
+        </div>
+
+        <!-- Quiz Question Box -->
+        <div id="quiz-active-card" class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 max-w-2xl mx-auto space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded border border-amber-500/30">POP QUIZ #4</span>
+            <div class="text-xs text-slate-300 font-mono flex items-center space-x-1">
+              <i class="fa-regular fa-clock text-rose-400"></i>
+              <span id="quiz-timer">Time Left: 24s</span>
+            </div>
+          </div>
+
+          <h4 class="text-base font-semibold text-white">In the Raft consensus algorithm, which condition causes a follower node to initiate a new election campaign?</h4>
+
+          <!-- Options -->
+          <div class="space-y-2 pt-2">
+            <button onclick="selectQuizOption(0, false)" class="quiz-opt w-full text-left p-3 rounded-lg bg-slate-900/80 border border-slate-700 hover:border-indigo-500 text-xs text-slate-200 transition">
+              A) When the follower receives an invalid client write request
+            </button>
+            <button onclick="selectQuizOption(1, true)" class="quiz-opt w-full text-left p-3 rounded-lg bg-slate-900/80 border border-slate-700 hover:border-indigo-500 text-xs text-slate-200 transition">
+              B) When its election timer expires without receiving an AppendEntries heartbeat from the current leader
+            </button>
+            <button onclick="selectQuizOption(2, false)" class="quiz-opt w-full text-left p-3 rounded-lg bg-slate-900/80 border border-slate-700 hover:border-indigo-500 text-xs text-slate-200 transition">
+              C) When the cluster nodes exceed more than 50 active TCP connections
+            </button>
+            <button onclick="selectQuizOption(3, false)" class="quiz-opt w-full text-left p-3 rounded-lg bg-slate-900/80 border border-slate-700 hover:border-indigo-500 text-xs text-slate-200 transition">
+              D) Whenever a snapshot compaction cycle completes on disk
+            </button>
+          </div>
+
+          <!-- Winner Announcement Card (Appears after submission) -->
+          <div id="quiz-winner-card" class="hidden bg-emerald-500/20 border-2 border-emerald-500 rounded-xl p-4 text-center space-y-2">
+            <div class="text-2xl">🏆 🎉</div>
+            <h4 class="text-base font-bold text-emerald-300">Fastest Correct Answer Winner!</h4>
+            <p class="text-xs text-slate-200">Winner: <strong class="text-white">Alex Chen (You)</strong> — Submitted in <span class="font-mono text-emerald-400 font-bold">1.84 seconds</span> (1,842 ms)</p>
+            <div class="text-[11px] text-slate-400">Rank: #1 of 312 students participated • +50 Points added to your course leaderboard</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. HACKATHON & CODING CONTEST ARENA -->
+    <div id="view-coding" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h3 class="font-bold text-white text-base">Spring Hackathon & Algorithmic Contest</h3>
+              <span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/30">TIME REMAINING: 02:44:12</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Problem 2: Distributed Leader Election Tick Engine</p>
+          </div>
+          <div class="flex items-center space-x-3">
+            <select id="code-lang" class="bg-slate-800 border border-slate-700 text-white text-xs rounded-lg px-3 py-2">
+              <option value="python">Python 3.12</option>
+              <option value="cpp">C++ 20 (GCC)</option>
+              <option value="java">Java 21</option>
+              <option value="javascript">JavaScript (Node.js)</option>
+            </select>
+            <button onclick="runCodeInSandbox()" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center space-x-2">
+              <i class="fa-solid fa-play"></i>
+              <span>Run Sandboxed Code</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <!-- Problem Statement -->
+          <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4 text-xs space-y-3">
+            <h4 class="font-bold text-white text-sm">Problem Description</h4>
+            <p class="text-slate-300 leading-relaxed">
+              Given a cluster of <code class="bg-slate-800 px-1 py-0.5 rounded text-cyan-300">N</code> nodes with unique IDs and heartbeat timestamps, determine whether a split-brain scenario occurred during the voting interval. Return the ID of the elected leader node with majority quorum, or <code class="bg-slate-800 px-1 py-0.5 rounded text-rose-300">-1</code> if election timed out.
+            </p>
+            <div class="bg-slate-900 p-3 rounded border border-slate-800 font-mono text-[11px] text-slate-300">
+              <div class="text-slate-500">// Example 1 Input:</div>
+              5<br>
+              101 102 101 101 103<br>
+              <div class="text-slate-500 mt-1">// Example 1 Output:</div>
+              101 (Majority quorum 3/5 achieved)
+            </div>
+          </div>
+
+          <!-- Code Editor Area -->
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col font-mono text-xs">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-800 text-[11px] text-slate-400">
+              <span>solution.py</span>
+              <span>Memory Limit: 256MB • Time Limit: 2.0s</span>
+            </div>
+            <textarea id="code-editor" class="flex-1 bg-transparent text-emerald-400 font-mono text-xs p-2 focus:outline-none resize-none h-48 custom-scrollbar">def elect_leader(n, votes):
+    counts = {}
+    for v in votes:
+        counts[v] = counts.get(v, 0) + 1
+        if counts[v] > n // 2:
+            return v
+    return -1
+
+# Sample invocation
+print(elect_leader(5, [101, 102, 101, 101, 103]))
+</textarea>
+            <!-- Execution Output Box -->
+            <div id="code-output-box" class="mt-3 bg-slate-900 border border-slate-800 rounded p-3 text-[11px] font-mono text-slate-300">
+              <div class="text-slate-500">Output Console: Ready to execute...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. AI DOUBT SOLVER (WITH ANTI-CHEAT LOCKOUT) -->
+    <div id="view-ai" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-6">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 text-xl">
+              <i class="fa-solid fa-brain"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-white text-base">Course-Grounded Contextual AI Tutor</h3>
+              <p class="text-xs text-slate-400">Syllabus-aware RAG doubt resolution with strict anti-cheat assessment lockouts.</p>
+            </div>
+          </div>
+
+          <!-- Anti-Cheat Toggle Simulation -->
+          <div class="flex items-center space-x-3 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
+            <span class="text-xs font-medium text-slate-300">Simulate Active Exam/Contest Lockout:</span>
+            <input type="checkbox" id="toggle-anti-cheat" onchange="toggleAntiCheatMode()" class="w-4 h-4 accent-rose-500 cursor-pointer">
+          </div>
+        </div>
+
+        <!-- Lockout Notice (Visible if lockout is simulated) -->
+        <div id="ai-lockout-card" class="hidden bg-rose-500/10 border-2 border-rose-500/40 rounded-xl p-4 mb-6 flex items-center space-x-4">
+          <i class="fa-solid fa-ban text-rose-500 text-2xl"></i>
+          <div>
+            <h4 class="text-xs font-bold text-rose-300 uppercase tracking-wide">Academic Integrity Guardrail Active</h4>
+            <p class="text-xs text-rose-200">The AI Doubt Solver is automatically disabled because an active contest or live pop quiz is underway. AI access will resume once assessment ends.</p>
+          </div>
+        </div>
+
+        <!-- Query Form -->
+        <div class="space-y-4 max-w-2xl mx-auto">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Your Question / Concept Doubt:</label>
+            <input id="ai-doubt-input" type="text" value="How does an AVL tree rebalance when a Left-Right insertion occurs?" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
+          </div>
+
+          <button onclick="askAiDoubt()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center space-x-2">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Ask AI Tutor</span>
+          </button>
+
+          <!-- Response Card -->
+          <div id="ai-response-card" class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 text-xs space-y-3">
+            <div class="flex items-center justify-between text-slate-400 border-b border-slate-700 pb-2">
+              <span class="font-bold text-purple-300 flex items-center space-x-1">
+                <i class="fa-solid fa-sparkles"></i>
+                <span>EduAegis Grounded AI Tutor Response</span>
+              </span>
+              <span class="text-[10px]">Verified against Course Syllabus</span>
+            </div>
+            <div id="ai-answer-text" class="text-slate-200 leading-relaxed whitespace-pre-line">
+              Based on your course materials in "Data Structures - Lecture 4: Balanced Binary Trees":
+
+              To balance an AVL tree when a node's left subtree becomes heavier via a right child (Left-Right case), you perform a double rotation:
+              1. First, perform a Left Rotation on the left child node.
+              2. Second, perform a Right Rotation on the parent root node.
+
+              Reference: Timestamp 23:40 in Lecture 4 video for the visual step-by-step animation.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. SAAS TIERS & MONETIZATION VIEW -->
+    <div id="view-saas" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <div class="border-b border-slate-800 pb-4 mb-6">
+          <h3 class="font-bold text-white text-base">SaaS Subscription Plans & Course Fee Revenue Split</h3>
+          <p class="text-xs text-slate-400">Designed for tutors, academies, and enterprise institutions to generate sustainable growth.</p>
+        </div>
+
+        <!-- 3 Tier Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <!-- Starter -->
+          <div class="bg-slate-800/40 border border-slate-700 rounded-xl p-5 flex flex-col justify-between">
+            <div>
+              <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded">STARTER TUTOR</span>
+              <div class="text-2xl font-bold text-white mt-3">$19 <span class="text-xs text-slate-400 font-normal">/ month</span></div>
+              <p class="text-xs text-slate-400 mt-2">Ideal for independent tutors starting online batches.</p>
+              <ul class="text-xs text-slate-300 space-y-2 mt-4">
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>Up to 50 active students</li>
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>Dynamic Forensic Watermarking</li>
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>1 Concurrent Live Classroom</li>
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>8% Platform commission on course sales</li>
+              </ul>
+            </div>
+            <button class="mt-6 w-full bg-slate-800 hover:bg-slate-700 text-white text-xs py-2 rounded-lg border border-slate-600">Select Starter</button>
+          </div>
+
+          <!-- Pro Academy -->
+          <div class="bg-gradient-to-b from-indigo-950/60 to-slate-900 border-2 border-indigo-500 rounded-xl p-5 flex flex-col justify-between relative shadow-xl shadow-indigo-500/10">
+            <span class="absolute -top-3 right-4 bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Most Popular</span>
+            <div>
+              <span class="text-xs font-bold text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded">PRO ACADEMY</span>
+              <div class="text-2xl font-bold text-white mt-3">$79 <span class="text-xs text-slate-400 font-normal">/ month</span></div>
+              <p class="text-xs text-slate-400 mt-2">For growing coaching institutes and academies.</p>
+              <ul class="text-xs text-slate-300 space-y-2 mt-4">
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>Up to 500 active students</li>
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>Hardware DRM Screen Capture Blocker</li>
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>Fastest-Finger-First Live Quizzes</li>
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>Coding Contests & Hackathons</li>
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>Custom Domain Whitelabeling</li>
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>5% Platform commission on course sales</li>
+              </ul>
+            </div>
+            <button class="mt-6 w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2 rounded-lg">Active Plan</button>
+          </div>
+
+          <!-- Enterprise -->
+          <div class="bg-slate-800/40 border border-slate-700 rounded-xl p-5 flex flex-col justify-between">
+            <div>
+              <span class="text-xs font-bold text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded">ENTERPRISE</span>
+              <div class="text-2xl font-bold text-white mt-3">$249 <span class="text-xs text-slate-400 font-normal">/ month</span></div>
+              <p class="text-xs text-slate-400 mt-2">For large educational organizations & colleges.</p>
+              <ul class="text-xs text-slate-300 space-y-2 mt-4">
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>Unlimited students & classes</li>
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>Dedicated WebRTC SFU Cluster</li>
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>Embeddable SSO Classroom SDK</li>
+                <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i>2.5% Platform commission on sales</li>
+              </ul>
+            </div>
+            <button class="mt-6 w-full bg-slate-800 hover:bg-slate-700 text-white text-xs py-2 rounded-lg border border-slate-600">Contact Enterprise</button>
+          </div>
+        </div>
+
+        <!-- Interactive Course Tuition Revenue Calculator -->
+        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
+          <h4 class="text-sm font-bold text-white mb-2">Tuition Fee Commission Calculator</h4>
+          <p class="text-xs text-slate-400 mb-4">See how much teacher earns per student enrollment under the Pro Academy (5% commission) tier:</p>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">Course Batch Price ($):</label>
+              <input type="number" id="calc-price" value="299" oninput="recalcRevenue()" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs text-white">
+            </div>
+            <div class="bg-slate-900 p-3 rounded border border-slate-800">
+              <div class="text-[11px] text-slate-400">Platform Share (5%):</div>
+              <div id="calc-platform-cut" class="text-base font-bold text-indigo-400">$14.95</div>
+            </div>
+            <div class="bg-slate-900 p-3 rounded border border-slate-800">
+              <div class="text-[11px] text-slate-400">Teacher Net Payout (95%):</div>
+              <div id="calc-teacher-cut" class="text-base font-bold text-emerald-400">$284.05</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Interactive JavaScript Logic -->
+  <script>
+    function switchTab(tabName) {
+      const tabs = ['founder', 'landing', 'teacher', 'live', 'curriculum', 'quiz', 'coding', 'ai', 'saas'];
+      tabs.forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (!view || !btn) return;
+        if (t === tabName) {
+          view.classList.remove('hidden');
+          if (t === 'founder') {
+            btn.classList.add('border-emerald-500', 'text-emerald-400');
+            btn.classList.remove('border-transparent', 'text-slate-400');
+          } else if (t === 'teacher') {
+            btn.classList.add('border-rose-500', 'text-rose-400');
+            btn.classList.remove('border-transparent', 'text-slate-400');
+          } else {
+            btn.classList.add('border-indigo-500', 'text-indigo-400');
+            btn.classList.remove('border-transparent', 'text-slate-400');
+          }
+        } else {
+          view.classList.add('hidden');
+          btn.classList.remove('border-indigo-500', 'border-emerald-500', 'border-rose-500', 'text-indigo-400', 'text-emerald-400', 'text-rose-400');
+          btn.classList.add('border-transparent', 'text-slate-400');
+        }
+      });
+    }
+
+    // Role Switcher Simulation
+    function switchRole(role) {
+      const nameEl = document.getElementById('profile-name');
+      const subEl = document.getElementById('profile-sub');
+      const avatarEl = document.getElementById('profile-avatar');
+
+      if (role === 'TEACHER') {
+        nameEl.innerText = 'Dr. Marcus Vance (Instructor)';
+        subEl.innerText = 'Apex Academy • Faculty Head';
+        avatarEl.innerText = 'MV';
+        avatarEl.className = 'w-9 h-9 rounded-full bg-rose-600/40 border border-rose-400 flex items-center justify-center text-sm font-bold text-rose-200';
+        switchTab('teacher');
+      } else if (role === 'FOUNDER') {
+        nameEl.innerText = 'Abhishek (Platform Founder)';
+        subEl.innerText = 'EduAegis Global HQ • SuperAdmin';
+        avatarEl.innerText = 'AD';
+        avatarEl.className = 'w-9 h-9 rounded-full bg-emerald-600/40 border border-emerald-400 flex items-center justify-center text-sm font-bold text-emerald-200';
+        switchTab('founder');
+      } else {
+        nameEl.innerText = 'Alex Chen';
+        subEl.innerText = 'Apex Tech Academy • CS-2026-042';
+        avatarEl.innerText = 'AC';
+        avatarEl.className = 'w-9 h-9 rounded-full bg-indigo-600/40 border border-indigo-400 flex items-center justify-center text-sm font-bold text-indigo-200';
+        switchTab('live');
+      }
+    }
+
+    // Teacher Broadcast Quiz Action
+    function launchTeacherQuiz() {
+      const q = document.getElementById('teacher-quiz-q').value;
+      alert(`⚡ QUIZ BROADCASTED TO 482 STUDENTS!\n\nQuestion: "${q}"\n\nTimer started: 30 seconds. Millisecond timestamping active on all student screens!`);
+      switchTab('quiz');
+      simulateTeacherPushQuiz();
+    }
+
+    // WhatsApp Reminder Broadcast Action
+    function sendWhatsAppReminder() {
+      fetch('/api/v1/notifications/send-reminder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lectureTitle: 'Raft Consensus & Distributed Fault Tolerance',
+          teacherName: 'Dr. Marcus Vance'
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(`📲 WHATSAPP & SMS DISPATCHED!\n\nSent to ${data.sentCount || 482} registered students.\n\nSample message sent:\n"${data.sampleMessage}"\n\nStudents can now join with 1-click directly from their WhatsApp alert!`);
+      })
+      .catch(() => {
+        alert("📲 WhatsApp class reminder sent to 482 students with 1-click room link!");
+      });
+    }
+
+    function triggerTeacherMuteAll() {
+      alert("🔇 GLOBAL MUTE ENFORCED: All 482 student microphones have been muted by Dr. Marcus Vance.");
+    }
+
+    // Business Tools: 1-Click Migration
+    function runInstituteMigration() {
+      const csv = document.getElementById('migration-csv').value;
+      const count = csv.split('\n').filter(l => l.trim().length > 0).length;
+      alert(`🎉 SUCCESS! Provisioned ${count} student accounts for this academy.\n\nSingle-click claim keys have been prepared and sent. The academy is now 100% migrated off Zoom in under 30 seconds!`);
+    }
+
+    // Business Tools: Affiliate Copy
+    function copyAffiliateLink() {
+      const input = document.getElementById('affiliate-link');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(input.value);
+        alert("Copied 20% lifetime affiliate tracking link to clipboard!");
+      } else {
+        alert("Affiliate link: " + input.value);
+      }
+    }
+
+    // Business Tools: Interactive Landing Page Piracy Loss Calculator
+    function calculateLandingRoi() {
+      const students = parseInt(document.getElementById('slider-students').value) || 250;
+      const fee = parseInt(document.getElementById('slider-fee').value) || 350;
+      
+      document.getElementById('slider-students-val').innerText = `${students} Students`;
+      document.getElementById('slider-fee-val').innerText = `$${fee} / student`;
+
+      const baseTuition = students * fee;
+      document.getElementById('calc-base-tuition').innerText = `$${baseTuition.toLocaleString()}`;
+
+      // 25% lost to leaks, 70% recovered by EduAegis
+      const recoveredProfit = Math.round(baseTuition * 0.25 * 0.70);
+      document.getElementById('calc-recovered-val').innerText = `+$${recoveredProfit.toLocaleString()}`;
+
+      // Annual Pro cost = $79 * 12 = $948
+      const multiplier = (recoveredProfit / 948).toFixed(1);
+      document.getElementById('calc-roi-multiplier').innerText = `${multiplier}x over`;
+    }
+
+    // 1. Teacher Not Audible / Visible Panic Alert
+    function triggerPanicAlert() {
+      const banner = document.getElementById('teacher-hud-banner');
+      banner.classList.remove('hidden');
+      alert("⚠️ Emergency Signal Sent to Teacher HUD: 8 students flagged audio/video issue. The teacher's screen is now alerting them with suggested diagnostic steps!");
+    }
+
+    function dismissTeacherAlert() {
+      document.getElementById('teacher-hud-banner').classList.add('hidden');
+    }
+
+    // 2. Hand Raise Toggle
+    let isHandRaised = false;
+    function toggleHandRaise() {
+      isHandRaised = !isHandRaised;
+      const btn = document.getElementById('btn-hand-raise');
+      const alertBox = document.getElementById('hand-raise-alert-box');
+      if (isHandRaised) {
+        btn.classList.remove('bg-amber-600/80');
+        btn.classList.add('bg-emerald-600');
+        btn.innerHTML = '<i class="fa-solid fa-hand"></i> <span>Hand Raised (#2)</span>';
+        alertBox.classList.remove('hidden');
+      } else {
+        btn.classList.remove('bg-emerald-600');
+        btn.classList.add('bg-amber-600/80');
+        btn.innerHTML = '<i class="fa-solid fa-hand"></i> <span>Raise Hand</span>';
+        alertBox.classList.add('hidden');
+      }
+    }
+
+    // 3. Browser Download Prohibited Check
+    function testBrowserDownloadBlock() {
+      alert("🛡️ DOWNLOAD RESTRICTION ENFORCED:\n\nDirect file downloads are strictly forbidden inside web browsers to prevent unauthorized copying. To download encrypted lectures for offline study during power blackouts, please launch the official EduAegis Windows or Mobile App.");
+    }
+
+    // 4. Anti-Capture Shield Test
+    function restoreShield() {
+      document.getElementById('blackout-shield').classList.add('hidden');
+    }
+
+    // 5. Fastest-Finger Quiz Simulation
+    function simulateTeacherPushQuiz() {
+      switchTab('quiz');
+      const winnerCard = document.getElementById('quiz-winner-card');
+      winnerCard.classList.add('hidden');
+      alert("⚡ Teacher has launched Pop Quiz #4 to all 482 students! Earliest correct submission wins!");
+    }
+
+    function selectQuizOption(index, isCorrect) {
+      const winnerCard = document.getElementById('quiz-winner-card');
+      if (isCorrect) {
+        winnerCard.classList.remove('hidden');
+      } else {
+        alert("Incorrect answer. In Raft, follower becomes candidate when its election timer expires!");
+      }
+    }
+
+    // 6. Sandboxed Code Execution
+    function runCodeInSandbox() {
+      const outputBox = document.getElementById('code-output-box');
+      outputBox.innerHTML = '<div class="text-cyan-400">Executing inside isolated container sandbox...</div>';
+      setTimeout(() => {
+        outputBox.innerHTML = `
+          <div class="text-emerald-400 font-bold">✔ ACCEPTED — 100 / 100 Score</div>
+          <div class="text-slate-400">Passed 10 / 10 test cases (including 5 hidden stress tests).</div>
+          <div class="text-slate-400">Execution time: 0.142s • Memory used: 18.4 MB</div>
+        `;
+      }, 700);
+    }
+
+    // 7. AI Anti-Cheat Toggle
+    let isAntiCheatOn = false;
+    function toggleAntiCheatMode() {
+      const checkbox = document.getElementById('toggle-anti-cheat');
+      const lockoutCard = document.getElementById('ai-lockout-card');
+      isAntiCheatOn = checkbox.checked;
+      if (isAntiCheatOn) {
+        lockoutCard.classList.remove('hidden');
+      } else {
+        lockoutCard.classList.add('hidden');
+      }
+    }
+
+    function askAiDoubt() {
+      if (isAntiCheatOn) {
+        alert("⛔ ACADEMIC INTEGRITY LOCKOUT: AI Doubt Solver is disabled during active tests or contests!");
+        return;
+      }
+      alert("AI Response generated and grounded in your course materials!");
+    }
+
+    // 8. Revenue Calculator
+    function recalcRevenue() {
+      const price = parseFloat(document.getElementById('calc-price').value) || 0;
+      const platform = (price * 0.05).toFixed(2);
+      const teacher = (price * 0.95).toFixed(2);
+      document.getElementById('calc-platform-cut').innerText = `$${platform}`;
+      document.getElementById('calc-teacher-cut').innerText = `$${teacher}`;
+    }
+
+    // 9. Interactive Course Checkout & 5% Fee Split Simulation
+    function testCourseCheckout() {
+      fetch('/api/v1/payments/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          courseTitle: 'Full-Stack Distributed Systems Engineering',
+          coursePrice: 299,
+          studentEmail: 'alex@student.edu'
+        })
+      })
+      .then(res => res.json())
+      .then(order => {
+        alert(`💳 STRIPE / RAZORPAY CHECKOUT INITIATED:\n\nOrder ID: ${order.orderId}\nCourse: ${order.courseTitle}\nTotal Charged: $${order.amountTotal}\n\nAUTOMATED REVENUE SPLIT:\n• EduAegis Platform Cut (5%): $${order.platformCommission}\n• Dr. Marcus Vance Net Payout (95%): $${order.teacherNetPayout}\n\nStatus: Order verified! DRM Playback keys provisioned to Alex Chen!`);
+      })
+      .catch(() => {
+        alert("💳 Payment Verified! Enrolled in course with automated 5% platform split.");
+      });
+    }
+  </script>
+</body>
+</html>
