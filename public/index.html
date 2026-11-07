@@ -653,47 +653,66 @@ Ananya Gupta, ananya@testprep.com, +91-9876543213, NEET Medical 2026</textarea>
           </div>
         </div>
 
-        <!-- Right Side: Classroom Chat & Moderation Controls -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl flex flex-col h-[520px]">
-          <!-- Room Header -->
-          <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <!-- Right Side: Classroom Chat & Moderation Controls (Day 1 Upgrade) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl flex flex-col h-[560px] overflow-hidden shadow-2xl">
+          <!-- Room Header & Tabs -->
+          <div class="p-3.5 border-b border-slate-800 bg-slate-850 flex items-center justify-between">
             <div class="flex items-center space-x-2">
-              <i class="fa-solid fa-comments text-indigo-400"></i>
-              <span class="font-semibold text-sm text-white">Live Class Chat</span>
+              <button onclick="setChatFilter('ALL')" id="filter-all-btn" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-indigo-600 text-white flex items-center space-x-1.5 shadow-sm">
+                <i class="fa-solid fa-comments"></i>
+                <span>Live Chat</span>
+              </button>
+              <button onclick="setChatFilter('QA')" id="filter-qa-btn" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center space-x-1.5 border border-slate-700">
+                <i class="fa-solid fa-circle-question text-purple-400"></i>
+                <span>Q&A Only</span>
+              </button>
             </div>
-            <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">Moderated</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center space-x-1">
+              <i class="fa-solid fa-database text-[9px]"></i>
+              <span>SQLite Saved</span>
+            </span>
+          </div>
+
+          <!-- Pinned Message Banner (Day 1) -->
+          <div id="pinned-message-banner" class="hidden bg-gradient-to-r from-amber-950/70 via-slate-900 to-amber-950/70 border-b border-amber-500/40 p-2.5 px-3 flex items-start justify-between gap-2 text-xs animate-fadeIn">
+            <div class="flex items-start space-x-2">
+              <i class="fa-solid fa-thumbtack text-amber-400 mt-0.5"></i>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-amber-300 text-[11px]" id="pinned-author">Dr. Marcus Vance</span>
+                  <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded font-mono uppercase">PINNED QUESTION</span>
+                </div>
+                <p class="text-slate-200 text-xs mt-0.5 leading-snug" id="pinned-text">Pinned question text goes here...</p>
+              </div>
+            </div>
+            <button onclick="unpinCurrentMessage()" class="text-slate-400 hover:text-white text-xs px-1.5 py-0.5 rounded" title="Unpin Message">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
 
           <!-- Chat Messages Scroll Container -->
-          <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 custom-scrollbar text-xs">
-            <div class="bg-slate-800/50 p-2.5 rounded-lg border border-slate-700/50">
-              <div class="flex items-center justify-between text-slate-400 mb-1">
-                <span class="font-semibold text-indigo-300">Dr. Marcus Vance (Instructor)</span>
-                <span>13:38</span>
-              </div>
-              <p class="text-slate-200">Welcome everyone! In today's session, make sure to solve the live quiz at 13:45 to test your grasp on Raft leader election.</p>
-            </div>
-
-            <div class="bg-slate-800/30 p-2.5 rounded-lg border border-slate-700/30">
-              <div class="flex items-center justify-between text-slate-400 mb-1">
-                <span class="font-semibold text-slate-300">Priya Sharma</span>
-                <span>13:40</span>
-              </div>
-              <p class="text-slate-200">Sir, what happens if the leader loses heartbeat during log replication?</p>
-            </div>
-
-            <div id="hand-raise-alert-box" class="hidden bg-amber-500/10 border border-amber-500/30 text-amber-300 p-2 rounded-lg flex items-center space-x-2">
-              <i class="fa-solid fa-hand text-amber-400"></i>
-              <span>Your hand is raised (#2 in teacher's queue).</span>
+          <div id="chat-messages" class="flex-1 p-3.5 overflow-y-auto space-y-2.5 custom-scrollbar text-xs">
+            <div id="chat-loading-spinner" class="text-center py-6 text-slate-500 text-xs">
+              <i class="fa-solid fa-circle-notch fa-spin text-indigo-400 mr-2"></i>
+              <span>Loading saved chat history from database...</span>
             </div>
           </div>
 
-          <!-- Chat Input -->
-          <div class="p-3 border-t border-slate-800 flex items-center space-x-2">
-            <input type="text" id="chat-input" onkeydown="if(event.key==='Enter') sendRealChatMessage()" placeholder="Type a message to live classroom..." class="flex-1 bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-            <button onclick="sendRealChatMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg text-xs font-semibold">
-              <i class="fa-solid fa-paper-plane"></i>
-            </button>
+          <!-- Chat Input Area (Day 1: Question Toggle & Database Push) -->
+          <div class="p-3 border-t border-slate-800 bg-slate-850 flex flex-col space-y-2">
+            <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <label class="flex items-center space-x-1.5 cursor-pointer">
+                <input type="checkbox" id="chat-is-question" class="w-3.5 h-3.5 rounded accent-purple-500 cursor-pointer">
+                <span>Mark as <strong>Q&A Question</strong> (?)</span>
+              </label>
+              <span class="text-[10px] text-slate-500">Press Enter to Send</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <input type="text" id="chat-input" onkeydown="if(event.key==='Enter') sendRealChatMessage()" placeholder="Ask a question or type a message..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <button onclick="sendRealChatMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2 rounded-lg text-xs font-semibold shadow-lg shadow-indigo-600/20 transition">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1393,21 +1412,41 @@ print(elect_leader(5, [101, 102, 101, 101, 103]))
         }
       });
 
-      // Real Chat Message Sync
+      // Day 1: Real Database-Backed Chat Sync & History
+      let liveChatMessages = [];
+      let activeChatFilter = 'ALL';
+
+      socket.on('CHAT_HISTORY_SYNC', (data) => {
+        liveChatMessages = data.messages || [];
+        renderChatMessages();
+      });
+
       socket.on('NEW_CHAT_MESSAGE', (msg) => {
-        const chatContainer = document.getElementById('chat-messages');
-        if (!chatContainer) return;
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60';
-        msgDiv.innerHTML = `
-          <div class="flex items-center justify-between text-slate-400 mb-1">
-            <span class="font-semibold ${msg.senderRole === 'TEACHER' ? 'text-rose-400' : 'text-slate-300'}">${msg.senderName}</span>
-            <span>${msg.timestamp}</span>
-          </div>
-          <p class="text-slate-200">${msg.text}</p>
-        `;
-        chatContainer.appendChild(msgDiv);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        liveChatMessages.push(msg);
+        renderChatMessages();
+      });
+
+      socket.on('CHAT_MESSAGE_PINNED', (msg) => {
+        const banner = document.getElementById('pinned-message-banner');
+        if (banner) {
+          banner.classList.remove('hidden');
+          document.getElementById('pinned-author').innerText = msg.senderName;
+          document.getElementById('pinned-text').innerText = msg.text;
+        }
+      });
+
+      socket.on('CHAT_MESSAGE_UNPINNED', () => {
+        const banner = document.getElementById('pinned-message-banner');
+        if (banner) banner.classList.add('hidden');
+      });
+
+      socket.on('QUESTION_UPVOTED', (data) => {
+        const msg = liveChatMessages.find(m => m.id === data.messageId);
+        if (msg) {
+          msg.upvotes = data.upvotes;
+          const upCountEl = document.getElementById(`upvote-count-${data.messageId}`);
+          if (upCountEl) upCountEl.innerText = data.upvotes;
+        }
       });
     } catch (e) {
       console.warn('Socket.io connection:', e);
@@ -1566,20 +1605,130 @@ print(elect_leader(5, [101, 102, 101, 101, 103]))
       triggerPanicAlert();
     }
 
-    // Real Live Chat Message via Socket.io
+    // =========================================================================
+    // DAY 1: CHAT & Q&A RENDERER & ACTIONS
+    // =========================================================================
+    function setChatFilter(type) {
+      activeChatFilter = type;
+      const allBtn = document.getElementById('filter-all-btn');
+      const qaBtn = document.getElementById('filter-qa-btn');
+
+      if (type === 'ALL') {
+        allBtn.className = 'text-xs font-bold px-2.5 py-1 rounded-lg bg-indigo-600 text-white flex items-center space-x-1.5 shadow-sm';
+        qaBtn.className = 'text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center space-x-1.5 border border-slate-700';
+      } else {
+        qaBtn.className = 'text-xs font-bold px-2.5 py-1 rounded-lg bg-purple-600 text-white flex items-center space-x-1.5 shadow-sm';
+        allBtn.className = 'text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center space-x-1.5 border border-slate-700';
+      }
+      renderChatMessages();
+    }
+
+    function renderChatMessages() {
+      const chatContainer = document.getElementById('chat-messages');
+      if (!chatContainer) return;
+
+      const filtered = liveChatMessages.filter(m => {
+        if (activeChatFilter === 'QA') return m.isQuestion;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        chatContainer.innerHTML = `
+          <div class="text-center py-8 text-slate-500 text-xs">
+            <i class="fa-solid fa-comments text-slate-600 text-lg mb-1 block"></i>
+            <span>${activeChatFilter === 'QA' ? 'No Q&A questions asked yet.' : 'No messages yet. Be the first to say hello!'}</span>
+          </div>
+        `;
+        return;
+      }
+
+      const isCurrentTeacher = document.getElementById('role-selector').value === 'TEACHER';
+
+      chatContainer.innerHTML = filtered.map(msg => {
+        const isTeacher = msg.senderRole === 'TEACHER';
+        return `
+          <div class="p-2.5 rounded-xl border transition ${isTeacher ? 'bg-indigo-950/40 border-indigo-500/40' : msg.isQuestion ? 'bg-purple-950/30 border-purple-500/30' : 'bg-slate-800/50 border-slate-700/50'}">
+            <div class="flex items-center justify-between text-[11px] mb-1">
+              <div class="flex items-center space-x-1.5">
+                <span class="font-bold ${isTeacher ? 'text-amber-300' : 'text-slate-200'}">${msg.senderName}</span>
+                ${isTeacher ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded font-bold border border-amber-500/40">INSTRUCTOR</span>' : ''}
+                ${msg.isQuestion ? '<span class="text-[9px] bg-purple-500/20 text-purple-300 px-1.5 py-0.2 rounded font-bold border border-purple-500/40">QUESTION</span>' : ''}
+              </div>
+              <span class="text-[10px] text-slate-500">${msg.timestamp}</span>
+            </div>
+            
+            <p class="text-slate-200 text-xs leading-relaxed break-words">${msg.text}</p>
+
+            <div class="flex items-center justify-between mt-2 pt-1.5 border-t border-slate-800/80 text-[10px]">
+              <!-- Upvote Question Button -->
+              <button onclick="upvoteQuestion('${msg.id}')" class="text-slate-400 hover:text-emerald-400 flex items-center space-x-1 py-0.5 px-1.5 rounded hover:bg-slate-800 transition">
+                <i class="fa-regular fa-thumbs-up"></i>
+                <span id="upvote-count-${msg.id}">${msg.upvotes || 0}</span>
+              </button>
+
+              <!-- Teacher Controls: Pin Message -->
+              ${isCurrentTeacher ? `
+                <button onclick="pinChatMessage('${msg.id}')" class="text-amber-400/80 hover:text-amber-300 flex items-center space-x-1 py-0.5 px-1.5 rounded hover:bg-amber-500/10 transition">
+                  <i class="fa-solid fa-thumbtack text-[9px]"></i>
+                  <span>Pin to Screen</span>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Day 1: Send Message to Real Database & Socket.io
     function sendRealChatMessage() {
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
       if (!text) return;
+
+      const isQuestion = document.getElementById('chat-is-question').checked;
+
       if (socket) {
         socket.emit('SEND_CHAT_MESSAGE', {
           sessionId: 'sess_live_alpha',
           senderName: document.getElementById('profile-name').innerText,
           senderRole: document.getElementById('role-selector').value,
-          text: text
+          text: text,
+          isQuestion: isQuestion
         });
       }
+
       input.value = '';
+      document.getElementById('chat-is-question').checked = false;
+    }
+
+    // Day 1: Teacher Pin Action
+    function pinChatMessage(messageId) {
+      if (socket) {
+        socket.emit('PIN_CHAT_MESSAGE', {
+          sessionId: 'sess_live_alpha',
+          messageId: messageId
+        });
+      }
+    }
+
+    function unpinCurrentMessage() {
+      if (socket) {
+        socket.emit('UNPIN_CHAT_MESSAGE', {
+          sessionId: 'sess_live_alpha'
+        });
+      }
+    }
+
+    // Day 1: Student Upvote Action
+    function upvoteQuestion(messageId) {
+      if (socket) {
+        socket.emit('UPVOTE_CHAT_QUESTION', {
+          sessionId: 'sess_live_alpha',
+          messageId: messageId
+        });
+      }
     }
   </script>
 </body>

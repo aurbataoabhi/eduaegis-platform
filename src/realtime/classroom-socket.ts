@@ -1,4 +1,7 @@
 import { Server as SocketIOServer, Socket } from 'socket.io';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export interface ClassroomState {
   sessionId: string;
@@ -83,6 +86,39 @@ export class ClassroomRealtimeManager {
             timeLimitSeconds: state.activeQuiz.timeLimitSeconds,
             launchedAtMillis: state.activeQuiz.launchedAtMillis
           } : null
+        });
+
+        // Day 1: Send permanent chat history and pinned question from SQLite database
+        prisma.liveChatMessage.findMany({
+          where: { sessionId: data.sessionId },
+          orderBy: { createdAt: 'asc' },
+          take: 100
+        }).then(messages => {
+          socket.emit('CHAT_HISTORY_SYNC', {
+            messages: messages.map(m => ({
+              id: m.id,
+              senderName: m.senderName,
+              senderRole: m.senderRole,
+              text: m.text,
+              isPinned: m.isPinned,
+              isQuestion: m.isQuestion,
+              upvotes: m.upvotes,
+              timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }))
+          });
+
+          // Check if there is an active pinned message
+          const pinned = messages.find(m => m.isPinned);
+          if (pinned) {
+            socket.emit('CHAT_MESSAGE_PINNED', {
+              id: pinned.id,
+              senderName: pinned.senderName,
+              senderRole: pinned.senderRole,
+              text: pinned.text
+            });
+          }
+        }).catch(err => {
+          console.error('Error fetching chat history from DB:', err);
         });
       });
 
@@ -340,21 +376,104 @@ export class ClassroomRealtimeManager {
         socket.to(data.sessionId).emit('WHITEBOARD_DRAW_EVENT', data);
       });
 
-      // 9. Real-time Classroom Chat
-      socket.on('SEND_CHAT_MESSAGE', (data: {
+      // 9. Real-time Classroom Chat with Database Persistence (Day 1)
+      socket.on('SEND_CHAT_MESSAGE', async (data: {
         sessionId: string;
         senderName: string;
         senderRole: string;
         text: string;
+        isQuestion?: boolean;
       }) => {
-        const messagePayload = {
-          id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-          senderName: data.senderName,
-          senderRole: data.senderRole,
-          text: data.text,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-        this.io.to(data.sessionId).emit('NEW_CHAT_MESSAGE', messagePayload);
+        const isQ = data.isQuestion || data.text.trim().endsWith('?');
+
+        try {
+          const saved = await prisma.liveChatMessage.create({
+            data: {
+              sessionId: data.sessionId,
+              senderName: data.senderName,
+              senderRole: data.senderRole,
+              text: data.text,
+              isQuestion: isQ,
+              isPinned: false
+            }
+          });
+
+          const messagePayload = {
+            id: saved.id,
+            senderName: saved.senderName,
+            senderRole: saved.senderRole,
+            text: saved.text,
+            isQuestion: saved.isQuestion,
+            isPinned: saved.isPinned,
+            upvotes: saved.upvotes,
+            timestamp: new Date(saved.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+
+          this.io.to(data.sessionId).emit('NEW_CHAT_MESSAGE', messagePayload);
+        } catch (err) {
+          console.error('Failed to save message to SQLite:', err);
+        }
+      });
+
+      // 10. Teacher Pin / Unpin Important Question (Day 1)
+      socket.on('PIN_CHAT_MESSAGE', async (data: {
+        sessionId: string;
+        messageId: string;
+      }) => {
+        try {
+          // Unpin any previous pinned message in this session
+          await prisma.liveChatMessage.updateMany({
+            where: { sessionId: data.sessionId, isPinned: true },
+            data: { isPinned: false }
+          });
+
+          // Pin the selected message
+          const pinnedMsg = await prisma.liveChatMessage.update({
+            where: { id: data.messageId },
+            data: { isPinned: true }
+          });
+
+          this.io.to(data.sessionId).emit('CHAT_MESSAGE_PINNED', {
+            id: pinnedMsg.id,
+            senderName: pinnedMsg.senderName,
+            senderRole: pinnedMsg.senderRole,
+            text: pinnedMsg.text
+          });
+        } catch (err) {
+          console.error('Failed to pin message:', err);
+        }
+      });
+
+      socket.on('UNPIN_CHAT_MESSAGE', async (data: { sessionId: string }) => {
+        try {
+          await prisma.liveChatMessage.updateMany({
+            where: { sessionId: data.sessionId, isPinned: true },
+            data: { isPinned: false }
+          });
+          this.io.to(data.sessionId).emit('CHAT_MESSAGE_UNPINNED', {});
+        } catch (err) {
+          console.error('Failed to unpin message:', err);
+        }
+      });
+
+      // 11. Upvote Student Question (Day 1)
+      socket.on('UPVOTE_CHAT_QUESTION', async (data: {
+        sessionId: string;
+        messageId: string;
+      }) => {
+        try {
+          const updated = await prisma.liveChatMessage.update({
+            where: { id: data.messageId },
+            data: { upvotes: { increment: 1 } }
+          });
+
+          this.io.to(data.sessionId).emit('QUESTION_UPVOTED', {
+            messageId: updated.id,
+            upvotes: updated.upvotes
+          });
+        } catch (err) {
+          console.error('Failed to upvote question:', err);
+        }
       });
     });
   }

@@ -176,6 +176,20 @@ model LiveQuizSubmission {
   @@index([quizId, isCorrect, elapsedMillis])
 }
 
+model LiveChatMessage {
+  id          String   @id @default(uuid())
+  sessionId   String
+  senderName  String
+  senderRole  String   // "TEACHER" | "STUDENT" | "TA"
+  text        String
+  isPinned    Boolean  @default(false)
+  isQuestion  Boolean  @default(false)
+  upvotes     Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([sessionId, createdAt])
+}
+
 model Contest {
   id               String               @id @default(uuid())
   orgId            String
