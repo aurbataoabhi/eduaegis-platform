@@ -1159,6 +1159,10 @@ print(elect_leader(5, [101, 102, 101, 101, 103]))
         avatarEl.className = 'w-9 h-9 rounded-full bg-indigo-600/40 border border-indigo-400 flex items-center justify-center text-sm font-bold text-indigo-200';
         switchTab('live');
       }
+
+      if (typeof renderChatMessages === 'function') {
+        renderChatMessages();
+      }
     }
 
     // Teacher Broadcast Quiz Action
@@ -1365,6 +1369,8 @@ print(elect_leader(5, [101, 102, 101, 101, 103]))
     let isDrawing = false;
     let lastX = 0;
     let lastY = 0;
+    let liveChatMessages = [];
+    let activeChatFilter = 'ALL';
 
     // Connect to real backend WebSocket
     try {
@@ -1413,9 +1419,6 @@ print(elect_leader(5, [101, 102, 101, 101, 103]))
       });
 
       // Day 1: Real Database-Backed Chat Sync & History
-      let liveChatMessages = [];
-      let activeChatFilter = 'ALL';
-
       socket.on('CHAT_HISTORY_SYNC', (data) => {
         liveChatMessages = data.messages || [];
         renderChatMessages();
@@ -1730,6 +1733,12 @@ print(elect_leader(5, [101, 102, 101, 101, 103]))
         });
       }
     }
+
+    // Initial render on page load
+    renderChatMessages();
+    window.addEventListener('DOMContentLoaded', () => {
+      renderChatMessages();
+    });
   </script>
 </body>
 </html>
